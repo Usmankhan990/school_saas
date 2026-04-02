@@ -1,0 +1,10 @@
+<?php $slug = tenant_slug(); ?>
+<div class="page-header"><h1>Add Fee Type</h1><a href="<?= url("$slug/fees/types") ?>" class="btn btn-outline">← Back</a></div>
+<div class="card">
+    <form method="POST" action="<?= url("$slug/fees/types/store") ?>">
+        <?= csrf_field() ?>
+        <div class="form-group"><label>Fee Type Name *</label><input type="text" name="name" class="form-control" required value="<?= old('name') ?>" placeholder="e.g. Tuition Fee"></div>
+        <div class="form-group"><label>Description</label><textarea name="description" class="form-control" rows="3"><?= old('description') ?></textarea></div>
+        <button class="btn btn-primary">Create Fee Type</button>
+    </form>
+</div>
