@@ -2,7 +2,7 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Float, Environment } from "@react-three/drei";
-import { Cap } from "./Scene3D";
+import { Cap } from "./Cap";
 import { useDark } from "./useDark";
 
 const books = [
