@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 
 export type Profile = {
-  id: string; school_id: string | null; name: string; email: string | null; role: string;
+  id: string; school_id: string | null; name: string; email: string | null; role: string; status: string;
 };
 export type School = { id: string; name: string; slug: string; currency: string | null; status: string | null };
 
@@ -23,6 +23,7 @@ export const getTenant = cache(async (slug: string) => {
     supabase.from("schools").select("*").eq("slug", slug).single<School>(),
   ]);
   if (!profile) redirect("/login");
+  if (profile.status !== "active") redirect("/login");
   if (!school) redirect(profile.role === "platform_admin" ? "/platform" : "/login");
   if (profile.role !== "platform_admin" && profile.school_id !== school.id) redirect("/login");
   return { supabase, userId, profile, school };

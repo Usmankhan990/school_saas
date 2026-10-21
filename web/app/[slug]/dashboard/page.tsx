@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import { getTenant } from "@/lib/auth";
 import { GraduationCap, UserRound, Wallet, AlertCircle, UserCheck, TrendingDown } from "lucide-react";
 import PageHeader from "@/components/PageHeader";
@@ -8,6 +9,7 @@ const money = (n: number, c = "PKR") => `${c} ${Math.round(n).toLocaleString()}`
 export default async function Dashboard({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { supabase, school, profile } = await getTenant(slug);
+  if (profile.role === "teacher") redirect(`/${slug}/teacher`);
   const today = new Date().toISOString().slice(0, 10);
   const monthStart = today.slice(0, 8) + "01";
 

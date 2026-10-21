@@ -1,7 +1,7 @@
 export type Field = {
   name: string;
   label: string;
-  type?: "text" | "number" | "date" | "time" | "textarea" | "select" | "fk";
+  type?: "text" | "number" | "date" | "time" | "textarea" | "select" | "fk" | "password";
   options?: string[];
   fk?: { table: string; label: string }; // foreign key lookup
   required?: boolean;
@@ -53,6 +53,7 @@ export const resources: Resource[] = [
       { name: "salary", label: "Salary", type: "number" },
       { name: "joining_date", label: "Joining Date", type: "date" },
       { name: "status", label: "Status", type: "select", options: active },
+      { name: "login_password", label: "Login password (optional – lets the teacher sign in on mobile)", type: "password" },
     ],
   },
   {
@@ -233,3 +234,7 @@ export const resources: Resource[] = [
 ];
 
 export const byKey = (key: string) => resources.find((r) => r.key === key);
+
+/** Modules a teacher account may open, and the ones they may add records to. */
+export const teacherReadKeys = ["students", "classes", "sections", "subjects", "timetable", "homework", "exams", "date-sheets", "results", "notifications", "events", "academic-sessions"];
+export const teacherWriteKeys = ["homework", "results"];

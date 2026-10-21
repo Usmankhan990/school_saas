@@ -9,9 +9,9 @@ export default async function TenantLayout({
   const { school, profile } = await getTenant(slug);
   return (
     <div className="flex min-h-screen">
-      <Sidebar slug={slug} schoolName={school.name} userName={profile.name} />
+      <Sidebar slug={slug} schoolName={school.name} userName={profile.name} role={profile.role} />
       <main className="min-w-0 flex-1 p-4 pb-24 pt-20 sm:p-8 sm:pb-24 sm:pt-20 lg:pb-8 lg:pt-8">{children}</main>
-      <BottomNav slug={slug} />
+      <BottomNav slug={slug} role={profile.role} />
     </div>
   );
 }

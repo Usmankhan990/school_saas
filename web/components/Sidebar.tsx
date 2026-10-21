@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Icons from "lucide-react";
-import { resources } from "@/lib/resources";
+import { resources, teacherReadKeys } from "@/lib/resources";
 import { logout } from "@/app/actions";
 import ThemeToggle from "./ThemeToggle";
 
 const groups = ["People", "Academics", "Exams", "Finance", "Communication"] as const;
 
-export default function Sidebar({ slug, schoolName, userName }: { slug: string; schoolName: string; userName: string }) {
+export default function Sidebar({ slug, schoolName, userName, role }: { slug: string; schoolName: string; userName: string; role: string }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
   useEffect(() => {
@@ -47,7 +47,7 @@ export default function Sidebar({ slug, schoolName, userName }: { slug: string; 
   return (
     <>
       {/* mobile top bar */}
-      <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 lg:hidden">
+      <div className="fixed inset-x-0 top-0 z-30 flex items-center justify-between print:hidden border-b border-[var(--border)] bg-[var(--surface)] px-4 py-2.5 lg:hidden">
         {brand}
         <div className="flex items-center gap-2">
           <ThemeToggle />
@@ -58,22 +58,38 @@ export default function Sidebar({ slug, schoolName, userName }: { slug: string; 
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-20 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 pb-24 pt-16 transition-transform lg:pb-4 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:pt-4 ${
+        className={`print:hidden fixed inset-y-0 left-0 z-20 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 pb-24 pt-16 transition-transform lg:pb-4 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:pt-4 ${
           open ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="mb-5 hidden lg:block">{brand}</div>
         <nav className="flex-1 space-y-4">
-          <div>{link(`/${slug}/dashboard`, "Dashboard", Icons.LayoutDashboard)}</div>
-          {groups.map((g) => (
-            <div key={g}>
-              <p className="muted mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider">{g}</p>
-              {g === "People" && link(`/${slug}/attendance`, "Attendance", Icons.UserCheck)}
-              {resources.filter((r) => r.group === g).map((r) => {
+          {role === "teacher" ? (
+            <div className="space-y-0.5">
+              {link(`/${slug}/teacher`, "My Day", Icons.Sun)}
+              {link(`/${slug}/attendance`, "Student Attendance", Icons.UserCheck)}
+              {link(`/${slug}/payslips`, "My Payslips", Icons.Banknote)}
+              {resources.filter((r) => teacherReadKeys.includes(r.key) && r.key !== "academic-sessions").map((r) => {
                 const Icon = (Icons as unknown as Record<string, React.ElementType>)[r.icon] ?? Icons.Circle;
                 return link(`/${slug}/${r.key}`, r.title, Icon);
               })}
             </div>
-          ))}
+          ) : (
+            <>
+              <div>{link(`/${slug}/dashboard`, "Dashboard", Icons.LayoutDashboard)}</div>
+              {groups.map((g) => (
+                <div key={g}>
+                  <p className="muted mb-1 px-3 text-[10px] font-semibold uppercase tracking-wider">{g}</p>
+                  {g === "People" && link(`/${slug}/attendance`, "Student Attendance", Icons.UserCheck)}
+                  {g === "People" && link(`/${slug}/teacher-attendance`, "Teacher Attendance", Icons.Fingerprint)}
+                  {g === "Finance" && link(`/${slug}/payslips`, "Payslips", Icons.Banknote)}
+                  {resources.filter((r) => r.group === g).map((r) => {
+                    const Icon = (Icons as unknown as Record<string, React.ElementType>)[r.icon] ?? Icons.Circle;
+                    return link(`/${slug}/${r.key}`, r.title, Icon);
+                  })}
+                </div>
+              ))}
+            </>
+          )}
         </nav>
         <div className="mt-4 border-t border-[var(--border)] pt-3">
           <div className="mb-2 flex items-center justify-between px-3">

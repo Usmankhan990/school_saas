@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { byKey } from "@/lib/resources";
+import { createLogin, isSchoolAdmin } from "@/lib/accounts";
 
 const slugify = (s: string) =>
   s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
@@ -20,8 +21,16 @@ export async function login(_: FormState, formData: FormData): Promise<FormState
   if (error || !data.user) return { error: "Invalid email or password." };
 
   const { data: profile } = await supabase
-    .from("profiles").select("role, school_id").eq("id", data.user.id).single();
+    .from("profiles").select("role, school_id, status").eq("id", data.user.id).single();
   if (!profile) return { error: "No profile found for this account." };
+  if (profile.status !== "active") {
+    await supabase.auth.signOut();
+    return {
+      error: profile.status === "pending"
+        ? "Your account is waiting for approval by the school admin."
+        : "This account is disabled.",
+    };
+  }
   if (profile.role === "platform_admin") redirect("/platform");
 
   const { data: school } = await supabase.from("schools").select("slug, status").eq("id", profile.school_id).single();
@@ -29,7 +38,7 @@ export async function login(_: FormState, formData: FormData): Promise<FormState
     await supabase.auth.signOut();
     return { error: "This school is inactive." };
   }
-  redirect(`/${school.slug}/dashboard`);
+  redirect(profile.role === "teacher" ? `/${school.slug}/teacher` : `/${school.slug}/dashboard`);
 }
 
 export async function logout() {
@@ -99,6 +108,7 @@ function clean(resourceKey: string, formData: FormData) {
   if (!r) throw new Error("Unknown resource");
   const row: Record<string, unknown> = {};
   for (const f of r.fields) {
+    if (f.name === "login_password") continue; // handled separately (creates the login)
     const v = formData.get(f.name);
     if (v === null || v === "") continue;
     row[f.name] = f.type === "number" ? Number(v) : f.name === "is_current" ? v === "true" : v;
@@ -111,6 +121,19 @@ export async function createRecord(slug: string, resourceKey: string, _: FormSta
   const { data: school } = await supabase.from("schools").select("id").eq("slug", slug).single();
   if (!school) return { error: "School not found." };
   const { r, row } = clean(resourceKey, formData);
+
+  // Optional: give a new teacher a login so they can use the mobile portal.
+  if (r.table === "teachers") {
+    const password = String(formData.get("login_password") || "");
+    if (password) {
+      if (!(await isSchoolAdmin(supabase, school.id))) return { error: "Only the school admin can create logins." };
+      if (!row.email) return { error: "Enter the teacher's email to create a login." };
+      if (password.length < 6) return { error: "Login password must be at least 6 characters." };
+      const created = await createLogin(school.id, String(row.name), String(row.email), password, "teacher", "active");
+      if ("error" in created) return created;
+      row.user_id = created.userId;
+    }
+  }
 
   if (r.table === "academic_sessions" && row.is_current)
     await supabase.from("academic_sessions").update({ is_current: false }).eq("school_id", school.id);

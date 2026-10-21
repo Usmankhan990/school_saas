@@ -1,8 +1,9 @@
 import { notFound } from "next/navigation";
 import { Trash2 } from "lucide-react";
 import { getTenant } from "@/lib/auth";
-import { byKey } from "@/lib/resources";
+import { byKey, teacherReadKeys, teacherWriteKeys } from "@/lib/resources";
 import { deleteRecord } from "@/app/actions";
+import { approveTeacher } from "@/app/teacher-actions";
 import RecordForm from "@/components/RecordForm";
 import PageHeader from "@/components/PageHeader";
 
@@ -12,7 +13,15 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   const { slug, resource } = await params;
   const r = byKey(resource);
   if (!r) notFound();
-  const { supabase, school } = await getTenant(slug);
+  const { supabase, school, profile } = await getTenant(slug);
+  const isTeacher = profile.role === "teacher";
+  if (isTeacher && !teacherReadKeys.includes(r.key)) notFound();
+  const canWrite = !isTeacher || teacherWriteKeys.includes(r.key);
+  let pending: { id: string; name: string; email: string | null; phone: string | null }[] = [];
+  if (!isTeacher && r.key === "teachers") {
+    const { data: p } = await supabase.from("teachers").select("id, name, email, phone").eq("school_id", school.id).eq("status", "pending");
+    pending = p ?? [];
+  }
 
   // lookup tables for foreign keys
   const fkFields = r.fields.filter((f) => f.type === "fk");
@@ -37,7 +46,26 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   return (
     <div className="space-y-6">
       <PageHeader title={r.title} subtitle={`Manage ${r.title.toLowerCase()} for your school`} />
-      <RecordForm slug={slug} resourceKey={r.key} fields={r.fields} lookups={lookups} />
+      {pending.length > 0 && (
+        <div className="card border-amber-400/50 bg-amber-50/60 dark:bg-amber-500/10">
+          <h2 className="mb-3 font-semibold">Pending teacher sign-ups ({pending.length})</h2>
+          <div className="space-y-2">
+            {pending.map((p) => (
+              <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--border)] bg-[var(--surface)] p-3">
+                <div className="text-sm">
+                  <p className="font-medium">{p.name}</p>
+                  <p className="muted">{p.email}{p.phone ? ` · ${p.phone}` : ""}</p>
+                </div>
+                <div className="flex gap-2">
+                  <form action={approveTeacher.bind(null, slug, p.id, true)}><button className="btn !py-1.5">Approve</button></form>
+                  <form action={approveTeacher.bind(null, slug, p.id, false)}><button className="glass rounded-xl px-4 py-1.5 text-sm hover:brightness-110">Reject</button></form>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {canWrite && <RecordForm slug={slug} resourceKey={r.key} fields={r.fields} lookups={lookups} />}
       {/* mobile: card list */}
       <div className="space-y-3 sm:hidden">
         {rows.length === 0 && <p className="card muted text-center text-sm">No records yet.</p>}
@@ -48,9 +76,9 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
                 {i === 0 ? label(c, row[c]) : (<><span className="muted">{head(c)}</span><span className="text-right">{label(c, row[c])}</span></>)}
               </div>
             ))}
-            <form action={deleteRecord.bind(null, slug, r.key, row.id)} className="absolute right-2 top-2">
+            {canWrite && <form action={deleteRecord.bind(null, slug, r.key, row.id)} className="absolute right-2 top-2">
               <button className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Delete"><Trash2 size={16} /></button>
-            </form>
+            </form>}
           </div>
         ))}
       </div>
@@ -70,11 +98,11 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
               <tr key={row.id} className="hover:bg-slate-50/70 dark:hover:bg-white/5">
                 {r.columns.map((c) => <td key={c} className="px-4 py-3">{label(c, row[c])}</td>)}
                 <td className="px-2">
-                  <form action={deleteRecord.bind(null, slug, r.key, row.id)}>
+                  {canWrite && <form action={deleteRecord.bind(null, slug, r.key, row.id)}>
                     <button className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Delete">
                       <Trash2 size={16} />
                     </button>
-                  </form>
+                  </form>}
                 </td>
               </tr>
             ))}
