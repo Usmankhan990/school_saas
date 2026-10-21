@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as Icons from "lucide-react";
@@ -13,6 +13,11 @@ const groups = ["People", "Academics", "Exams", "Finance", "Communication"] as c
 export default function Sidebar({ slug, schoolName, userName }: { slug: string; schoolName: string; userName: string }) {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const t = () => setOpen((o) => !o);
+    window.addEventListener("toggle-sidebar", t);
+    return () => window.removeEventListener("toggle-sidebar", t);
+  }, []);
 
   const link = (href: string, label: string, Icon: React.ElementType) => {
     const active = path === href;
@@ -53,7 +58,7 @@ export default function Sidebar({ slug, schoolName, userName }: { slug: string; 
       </div>
 
       <aside
-        className={`fixed inset-y-0 left-0 z-20 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 pt-16 transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:pt-4 ${
+        className={`fixed inset-y-0 left-0 z-20 flex w-64 shrink-0 flex-col overflow-y-auto border-r border-[var(--border)] bg-[var(--surface)] p-4 pb-24 pt-16 transition-transform lg:pb-4 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:pt-4 ${
           open ? "translate-x-0" : "-translate-x-full"}`}
       >
         <div className="mb-5 hidden lg:block">{brand}</div>

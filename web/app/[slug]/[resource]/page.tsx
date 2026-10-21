@@ -38,7 +38,23 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
     <div className="space-y-6">
       <PageHeader title={r.title} subtitle={`Manage ${r.title.toLowerCase()} for your school`} />
       <RecordForm slug={slug} resourceKey={r.key} fields={r.fields} lookups={lookups} />
-      <div className="card overflow-x-auto p-0">
+      {/* mobile: card list */}
+      <div className="space-y-3 sm:hidden">
+        {rows.length === 0 && <p className="card muted text-center text-sm">No records yet.</p>}
+        {rows.map((row) => (
+          <div key={row.id} className="card relative space-y-1.5 pr-12">
+            {r.columns.map((c, i) => (
+              <div key={c} className={i === 0 ? "text-base font-semibold" : "flex justify-between gap-3 text-sm"}>
+                {i === 0 ? label(c, row[c]) : (<><span className="muted">{head(c)}</span><span className="text-right">{label(c, row[c])}</span></>)}
+              </div>
+            ))}
+            <form action={deleteRecord.bind(null, slug, r.key, row.id)} className="absolute right-2 top-2">
+              <button className="rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600" aria-label="Delete"><Trash2 size={16} /></button>
+            </form>
+          </div>
+        ))}
+      </div>
+      <div className="card hidden overflow-x-auto p-0 sm:block">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase muted dark:bg-white/5 dark:text-slate-400">
             <tr>
