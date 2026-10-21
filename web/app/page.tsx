@@ -54,7 +54,7 @@ export default function Home() {
         <div className="absolute inset-0">
           <div className="absolute left-1/4 top-1/4 h-[28rem] w-[28rem] rounded-full bg-indigo-500/25 blur-[120px]" />
           <div className="absolute bottom-0 right-1/4 h-[26rem] w-[26rem] rounded-full bg-fuchsia-500/20 blur-[120px]" />
-          <HeroScene />
+          <HeroScene align="right" />
         </div>
         <div className="pointer-events-none relative mx-auto w-full max-w-6xl px-6 pt-28">
           <div className="pointer-events-auto max-w-2xl">
