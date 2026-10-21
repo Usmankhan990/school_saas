@@ -148,7 +148,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 12),
                         Text(
-                          'New school? Register at the EduVerse website, then sign in here.',
+                          'New school or new teacher? Sign up on the EduVerse website, then sign in here.',
                           textAlign: TextAlign.center,
                           style: t.bodySmall,
                         ),

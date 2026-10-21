@@ -34,7 +34,7 @@ class AppSession {
     if (user == null) return null;
     final profile =
         await db.from('profiles').select().eq('id', user.id).maybeSingle();
-    if (profile == null) return null;
+    if (profile == null || profile['status'] != 'active') return null;
     final base = AppSession(
       userId: user.id,
       name: (profile['name'] as String?) ?? 'User',

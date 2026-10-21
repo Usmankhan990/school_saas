@@ -7,6 +7,7 @@ import '../session.dart';
 import 'home_shell.dart';
 import 'login_screen.dart';
 import 'platform_screen.dart';
+import 'teacher_shell.dart';
 
 /// Decides what to show: login, platform admin console, or the school app.
 class Gate extends StatefulWidget {
@@ -51,6 +52,7 @@ class _GateState extends State<Gate> {
           return const LoginScreen();
         }
         if (session.isPlatformAdmin) return PlatformScreen(session: session);
+        if (session.role == 'teacher') return TeacherShell(session: session);
         return HomeShell(session: session);
       },
     );
