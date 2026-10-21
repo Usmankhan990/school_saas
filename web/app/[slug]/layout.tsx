@@ -9,7 +9,7 @@ export default async function TenantLayout({
   return (
     <div className="flex min-h-screen">
       <Sidebar slug={slug} schoolName={school.name} userName={profile.name} />
-      <main className="min-w-0 flex-1 p-4 sm:p-8">{children}</main>
+      <main className="min-w-0 flex-1 p-4 pt-20 sm:p-8 sm:pt-20 lg:pt-8">{children}</main>
     </div>
   );
 }

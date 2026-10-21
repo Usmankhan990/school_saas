@@ -4,8 +4,9 @@ import { useRef } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
 import { Float, Stars, MeshDistortMaterial, Environment } from "@react-three/drei";
 import type { Group } from "three";
+import { useDark } from "./useDark";
 
-function Cap() {
+export function Cap() {
   return (
     <group rotation={[0.35, 0, 0]}>
       {/* board */}
@@ -57,13 +58,14 @@ function Rig({ children }: { children: React.ReactNode }) {
 }
 
 export default function Scene3D() {
+  const dark = useDark();
   return (
     <Canvas camera={{ position: [0, 0, 8], fov: 50 }} dpr={[1, 1.75]}>
       <ambientLight intensity={0.6} />
       <pointLight position={[6, 6, 6]} intensity={80} color="#a5b4fc" />
       <pointLight position={[-6, -3, 4]} intensity={60} color="#f0abfc" />
-      <Stars radius={60} depth={40} count={2500} factor={3} fade speed={1} />
-      <Environment preset="city" />
+      {dark && <Stars radius={60} depth={40} count={2500} factor={3} fade speed={1} />}
+      <Environment preset={dark ? "city" : "apartment"} />
 
       <Float speed={2} rotationIntensity={0.4} floatIntensity={1.2}>
         <Rig>
@@ -74,7 +76,7 @@ export default function Scene3D() {
       <Float speed={1.5} floatIntensity={2}>
         <mesh position={[0, 0, -3]} scale={2.2}>
           <icosahedronGeometry args={[1, 6]} />
-          <MeshDistortMaterial color="#6366f1" distort={0.45} speed={2} transparent opacity={0.28} wireframe />
+          <MeshDistortMaterial color="#6366f1" distort={0.45} speed={2} transparent opacity={dark ? 0.28 : 0.45} wireframe />
         </mesh>
       </Float>
 

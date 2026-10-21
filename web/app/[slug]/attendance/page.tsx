@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getTenant } from "@/lib/auth";
 import { saveAttendance } from "@/app/actions";
+import PageHeader from "@/components/PageHeader";
 
 type Student = { id: string; name: string; roll_no: string | null; admission_no: string };
 
@@ -28,7 +29,7 @@ export default async function AttendancePage({
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Attendance</h1>
+      <PageHeader title="Attendance" subtitle="Mark daily attendance class by class" />
       <form className="card flex flex-wrap items-end gap-4">
         <label>
           <span className="mb-1 block text-xs font-medium text-slate-600">Class</span>
@@ -48,10 +49,10 @@ export default async function AttendancePage({
         <form action={saveAttendance.bind(null, slug)} className="card p-0">
           <input type="hidden" name="date" value={date} />
           <table className="w-full text-left text-sm">
-            <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+            <thead className="bg-slate-50 text-xs uppercase muted dark:bg-white/5 dark:text-slate-400">
               <tr><th className="px-4 py-3">Roll</th><th className="px-4 py-3">Student</th><th className="px-4 py-3">Status</th></tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-slate-100 dark:divide-white/10">
               {students.length === 0 && (
                 <tr><td colSpan={3} className="px-4 py-10 text-center text-slate-400">
                   No active students in this class. <Link href={`/${slug}/students`} className="text-indigo-600">Add students</Link>

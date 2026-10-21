@@ -19,7 +19,7 @@ export default function RecordForm({
     <form ref={ref} action={action} className="card grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {fields.map((f) => (
         <label key={f.name} className={f.type === "textarea" ? "sm:col-span-2 lg:col-span-3" : ""}>
-          <span className="mb-1 block text-xs font-medium text-slate-600">{f.label}{f.required && " *"}</span>
+          <span className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">{f.label}{f.required && " *"}</span>
           {f.type === "textarea" ? (
             <textarea name={f.name} rows={2} className="input" />
           ) : f.type === "select" ? (

@@ -9,7 +9,7 @@ export default function SchoolForm() {
   useEffect(() => { if (!pending && !state?.error) ref.current?.reset(); }, [pending, state]);
   const f = (name: string, label: string, type = "text") => (
     <label>
-      <span className="mb-1 block text-xs font-medium text-slate-600">{label}</span>
+      <span className="mb-1 block text-xs font-medium text-slate-600 dark:text-slate-300">{label}</span>
       <input name={name} type={type} className="input" required={name !== "slug"} />
     </label>
   );

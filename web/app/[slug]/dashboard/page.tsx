@@ -1,5 +1,7 @@
 import { getTenant } from "@/lib/auth";
 import { GraduationCap, UserRound, Wallet, AlertCircle, UserCheck, TrendingDown } from "lucide-react";
+import PageHeader from "@/components/PageHeader";
+import TiltCard from "@/components/TiltCard";
 
 const money = (n: number, c = "PKR") => `${c} ${Math.round(n).toLocaleString()}`;
 
@@ -35,31 +37,30 @@ export default async function Dashboard({ params }: { params: Promise<{ slug: st
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold">Welcome, {profile.name} 👋</h1>
-        <p className="text-sm text-slate-500">{school.name} overview</p>
-      </div>
+      <PageHeader title={`Welcome, ${profile.name}`} subtitle={`${school.name} overview`} />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {cards.map(({ label, value, Icon, tint }) => (
-          <div key={label} className="card flex items-center gap-4 transition hover:-translate-y-0.5 hover:shadow-md">
-            <span className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${tint} text-white shadow-lg`}>
-              <Icon size={22} />
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-xl font-bold">{value}</p>
-              <p className="text-xs text-slate-500">{label}</p>
+        {cards.map(({ label, value, Icon, tint }, i) => (
+          <TiltCard key={label} delay={(i % 4) * 0.06} className="p-5" tilt={10}>
+            <div className="flex items-center gap-4">
+              <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br ${tint} text-white shadow-lg`}>
+                <Icon size={22} />
+              </span>
+              <div className="min-w-0">
+                <p className="truncate text-xl font-bold">{value}</p>
+                <p className="muted text-xs">{label}</p>
+              </div>
             </div>
-          </div>
+          </TiltCard>
         ))}
       </div>
       <section className="card">
         <h2 className="mb-3 font-semibold">Latest notifications</h2>
-        {(notes.data ?? []).length === 0 && <p className="text-sm text-slate-500">Nothing yet.</p>}
-        <ul className="divide-y divide-slate-100">
+        {(notes.data ?? []).length === 0 && <p className="muted text-sm">Nothing yet.</p>}
+        <ul className="divide-y divide-slate-100 dark:divide-white/10">
           {(notes.data ?? []).map((n, i) => (
             <li key={i} className="flex justify-between py-2 text-sm">
               <span>{n.title}</span>
-              <span className="text-slate-400">{new Date(n.created_at).toLocaleDateString()}</span>
+              <span className="muted">{new Date(n.created_at).toLocaleDateString()}</span>
             </li>
           ))}
         </ul>

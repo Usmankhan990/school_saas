@@ -1,44 +1,90 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  --background: #f6f7fb;
+  --background: #f3f5fb;
   --foreground: #0f172a;
-  --brand: #6366f1;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --lp-bg: #f5f7ff;
+  --lp-fg: #0f172a;
+  --lp-muted: #475569;
+  --glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(15, 23, 42, 0.08);
+  --grad-a: #4f46e5;
+  --grad-b: #c026d3;
+  --grad-c: #0891b2;
+}
+
+.dark {
+  --background: #080a1c;
+  --foreground: #e5e7f5;
+  --surface: #11142b;
+  --border: rgba(255, 255, 255, 0.09);
+  --muted: #94a3b8;
+  --lp-bg: #070816;
+  --lp-fg: #ffffff;
+  --lp-muted: #a5b0c8;
+  --glass-bg: rgba(255, 255, 255, 0.06);
+  --glass-border: rgba(255, 255, 255, 0.12);
+  --grad-a: #a5b4fc;
+  --grad-b: #f0abfc;
+  --grad-c: #67e8f9;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-brand: var(--brand);
   --font-sans: var(--font-inter), system-ui, sans-serif;
 }
+
+html { color-scheme: light; }
+html.dark { color-scheme: dark; }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-inter), system-ui, sans-serif;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .input {
-  @apply w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-sm outline-none transition focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/15;
+  width: 100%;
+  border-radius: 0.75rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--foreground);
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.18);
 }
 .btn {
   @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-indigo-500/25 transition hover:brightness-110 active:scale-[.98] disabled:opacity-60;
 }
 .card {
-  @apply rounded-2xl border border-slate-200/70 bg-white p-5 shadow-sm;
+  border-radius: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  padding: 1.25rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
-
 .glass {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--glass-bg);
   backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--glass-border);
 }
 .text-gradient {
-  background: linear-gradient(90deg, #a5b4fc, #f0abfc, #67e8f9);
+  background: linear-gradient(90deg, var(--grad-a), var(--grad-b), var(--grad-c));
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
 }
-@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
-.float { animation: float 6s ease-in-out infinite; }
+.muted { color: var(--muted); }
+.lp-muted { color: var(--lp-muted); }
