@@ -14,16 +14,16 @@ export default async function AttendancePage({
   const { slug } = await params;
   const { class: classId, date: dateQ } = await searchParams;
   const date = dateQ ?? new Date().toISOString().slice(0, 10);
-  const { supabase } = await getTenant(slug);
+  const { supabase, school } = await getTenant(slug);
 
-  const { data: classes } = await supabase.from("classes").select("id, name").order("numeric_name");
+  const { data: classes } = await supabase.from("classes").select("id, name").eq("school_id", school.id).order("numeric_name");
   let students: Student[] = [];
   const existing: Record<string, string> = {};
   if (classId) {
     const { data } = await supabase.from("students").select("id, name, roll_no, admission_no")
-      .eq("class_id", classId).eq("status", "active").order("name");
+      .eq("school_id", school.id).eq("class_id", classId).eq("status", "active").order("name");
     students = (data ?? []) as Student[];
-    const { data: att } = await supabase.from("attendance").select("student_id, status").eq("date", date);
+    const { data: att } = await supabase.from("attendance").select("student_id, status").eq("school_id", school.id).eq("date", date);
     (att ?? []).forEach((a) => { existing[a.student_id] = a.status; });
   }
 

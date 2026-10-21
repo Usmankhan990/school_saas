@@ -11,15 +11,16 @@ export default async function Dashboard({ params }: { params: Promise<{ slug: st
   const today = new Date().toISOString().slice(0, 10);
   const monthStart = today.slice(0, 8) + "01";
 
-  const count = (t: string) => supabase.from(t).select("*", { count: "exact", head: true });
+  const sid = school.id;
+  const count = (t: string) => supabase.from(t).select("*", { count: "exact", head: true }).eq("school_id", sid);
   const [students, teachers, staff, present, absent, pays, unpaid, expenses, notes] = await Promise.all([
     count("students"), count("teachers"), count("staff"),
-    supabase.from("attendance").select("*", { count: "exact", head: true }).eq("date", today).eq("status", "present"),
-    supabase.from("attendance").select("*", { count: "exact", head: true }).eq("date", today).eq("status", "absent"),
-    supabase.from("payments").select("amount").gte("paid_on", monthStart),
-    supabase.from("student_fees").select("amount").neq("status", "paid"),
-    supabase.from("expenses").select("amount").gte("spent_on", monthStart),
-    supabase.from("notifications").select("title, created_at").order("created_at", { ascending: false }).limit(5),
+    supabase.from("attendance").select("*", { count: "exact", head: true }).eq("school_id", sid).eq("date", today).eq("status", "present"),
+    supabase.from("attendance").select("*", { count: "exact", head: true }).eq("school_id", sid).eq("date", today).eq("status", "absent"),
+    supabase.from("payments").select("amount").eq("school_id", sid).gte("paid_on", monthStart),
+    supabase.from("student_fees").select("amount").eq("school_id", sid).neq("status", "paid"),
+    supabase.from("expenses").select("amount").eq("school_id", sid).gte("spent_on", monthStart),
+    supabase.from("notifications").select("title, created_at").eq("school_id", sid).order("created_at", { ascending: false }).limit(5),
   ]);
   const sum = (rows: { amount: number }[] | null) => (rows ?? []).reduce((a, r) => a + Number(r.amount), 0);
   const cur = school.currency ?? "PKR";

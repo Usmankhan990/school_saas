@@ -12,14 +12,14 @@ export default async function ResourcePage({ params }: { params: Promise<{ slug:
   const { slug, resource } = await params;
   const r = byKey(resource);
   if (!r) notFound();
-  const { supabase } = await getTenant(slug);
+  const { supabase, school } = await getTenant(slug);
 
   // lookup tables for foreign keys
   const fkFields = r.fields.filter((f) => f.type === "fk");
   const lookups: Record<string, { id: string; label: string }[]> = {};
-  const mainQuery = supabase.from(r.table).select("*").order(r.order ?? "created_at", { ascending: r.order ? true : false }).limit(500);
+  const mainQuery = supabase.from(r.table).select("*").eq("school_id", school.id).order(r.order ?? "created_at", { ascending: r.order ? true : false }).limit(500);
   const [{ data }] = await Promise.all([mainQuery, ...fkFields.map(async (f) => {
-    const { data } = await supabase.from(f.fk!.table).select(`id, ${f.fk!.label}`).limit(1000);
+    const { data } = await supabase.from(f.fk!.table).select(`id, ${f.fk!.label}`).eq("school_id", school.id).limit(1000);
     lookups[f.name] = ((data ?? []) as unknown as Row[]).map((d) => ({ id: d.id, label: String(d[f.fk!.label]) }));
   })]);
 
