@@ -4,6 +4,14 @@
  */
 class SectionModel
 {
+    public static function countForSchool($schoolId)
+    {
+        $pdo = Database::getPdo();
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM sections WHERE school_id = ?");
+        $stmt->execute([$schoolId]);
+        return $stmt->fetchColumn();
+    }
+
     public static function allForSchool(int $schoolId): array
     {
         return Database::fetchAll(

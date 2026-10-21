@@ -1,4 +1,6 @@
 <?php
+require_once 'models/SchoolSetting.php';
+
 /**
  * SettingsController – School settings (logo, profile, academic session)
  */
@@ -9,9 +11,12 @@ class SettingsController extends Controller
         $this->authorize(['super_admin', 'admin']);
         $school = School::find(current_school_id());
 
+        $settings = SchoolSetting::getAll(current_school_id());
+
         $this->view('settings.index', [
             'title'  => 'School Settings',
             'school' => $school,
+            'settings' => $settings,
         ]);
     }
 
@@ -41,6 +46,14 @@ class SettingsController extends Controller
         // Update session
         Session::set('tenant_name', $this->input('name') ?: $school['name']);
         Session::set('tenant_logo_url', $logoUrl);
+
+        // Update other custom settings
+        $settingsKeys = ['timezone', 'date_format', 'attendance_type', 'grading_system', 'receipt_footer'];
+        foreach ($settingsKeys as $key) {
+            if (isset($_POST[$key])) {
+                SchoolSetting::set($schoolId, $key, $_POST[$key]);
+            }
+        }
 
         $this->audit('update', 'school_settings', $schoolId);
         flash('success', 'Settings updated successfully!');

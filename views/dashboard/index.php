@@ -24,6 +24,26 @@
         <div class="label">Classes</div>
     </div>
     <div class="stat-card">
+        <div class="number"><?= $totalSections ?? 0 ?></div>
+        <div class="label">Sections</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #22c55e;">
+        <div class="number"><?= $todayPresent ?? 0 ?></div>
+        <div class="label">Today's Present</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #ef4444;">
+        <div class="number"><?= $todayAbsent ?? 0 ?></div>
+        <div class="label">Today's Absent</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #3b82f6;">
+        <div class="number"><?= isset($totalFeesCollected) ? number_format($totalFeesCollected, 2) : '0.00' ?></div>
+        <div class="label">Total Fees Collected</div>
+    </div>
+    <div class="stat-card" style="border-top: 3px solid #f59e0b;">
+        <div class="number"><?= isset($totalFeesPending) ? number_format($totalFeesPending, 2) : '0.00' ?></div>
+        <div class="label">Pending Fees</div>
+    </div>
+    <div class="stat-card">
         <div class="number"><?= $totalUsers ?? 0 ?></div>
         <div class="label">Users</div>
     </div>

@@ -21,7 +21,15 @@ class DashboardController extends Controller
             $data['totalTeachers']  = Teacher::countForSchool($schoolId);
             $data['totalStaff']     = Staff::countForSchool($schoolId);
             $data['totalClasses']   = ClassModel::countForSchool($schoolId);
+            $data['totalSections']  = SectionModel::countForSchool($schoolId);
             $data['totalUsers']     = User::countForSchool($schoolId);
+            
+            $attendanceStats = Attendance::getTodayStats($schoolId);
+            $data['todayPresent'] = $attendanceStats['present'] ?? 0;
+            $data['todayAbsent'] = $attendanceStats['absent'] ?? 0;
+
+            $data['totalFeesCollected'] = StudentFee::totalCollected($schoolId);
+            $data['totalFeesPending'] = StudentFee::totalPending($schoolId);
         }
 
         // Teacher-specific: show their assigned class count (placeholder for Phase 2)

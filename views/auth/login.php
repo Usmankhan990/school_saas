@@ -4,8 +4,8 @@
  * Variables: $title, $isSchool, $schoolName?, $schoolLogo?, $slug?
  */
 $formAction = isset($isSchool) && $isSchool ? url(($slug ?? '') . '/login') : url('login');
-$flashType  = Session::get('flash_type');
-$flashMsg   = Session::get('flash_message');
+$flashType  = Session::flash('flash_type');
+$flashMsg   = Session::flash('flash_message');
 ?>
 <!DOCTYPE html>
 <html lang="en">

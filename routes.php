@@ -48,6 +48,13 @@ $router->get('{slug}/dashboard', 'DashboardController@index', ['tenant', 'auth']
 $router->get('{slug}/settings', 'SettingsController@index', ['tenant', 'auth']);
 $router->post('{slug}/settings', 'SettingsController@update', ['tenant', 'auth', 'csrf']);
 
+// ── Academic Sessions ──
+$router->get('{slug}/academic-sessions', 'AcademicSessionController@index', ['tenant', 'auth']);
+$router->get('{slug}/academic-sessions/create', 'AcademicSessionController@create', ['tenant', 'auth']);
+$router->post('{slug}/academic-sessions/store', 'AcademicSessionController@store', ['tenant', 'auth', 'csrf']);
+$router->get('{slug}/academic-sessions/{id}/edit', 'AcademicSessionController@edit', ['tenant', 'auth']);
+$router->post('{slug}/academic-sessions/{id}/update', 'AcademicSessionController@update', ['tenant', 'auth', 'csrf']);
+
 // ── Users ──
 $router->get('{slug}/users', 'UserController@index', ['tenant', 'auth']);
 $router->get('{slug}/users/create', 'UserController@create', ['tenant', 'auth']);

@@ -96,4 +96,19 @@ class Attendance
             ]);
         }
     }
+
+    public static function getTodayStats(int $schoolId): array
+    {
+        $today = date('Y-m-d');
+        return Database::fetch(
+            "SELECT 
+                COUNT(*) as total_marked,
+                SUM(CASE WHEN status='P' THEN 1 ELSE 0 END) as present,
+                SUM(CASE WHEN status='A' THEN 1 ELSE 0 END) as absent,
+                SUM(CASE WHEN status='L' THEN 1 ELSE 0 END) as late
+             FROM attendance_students 
+             WHERE school_id = ? AND date = ?",
+            [$schoolId, $today]
+        ) ?: ['total_marked' => 0, 'present' => 0, 'absent' => 0, 'late' => 0];
+    }
 }
