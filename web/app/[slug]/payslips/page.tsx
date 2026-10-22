@@ -27,7 +27,31 @@ export default async function PayslipsPage({ params }: { params: Promise<{ slug:
         subtitle={isTeacher ? "Your monthly salary slips" : "Generated automatically from teacher attendance"} />
       {!isTeacher && <GeneratePayslips slug={slug} defaultMonth={previousMonth(localNow(tz).date)} />}
 
-      <div className="card overflow-x-auto p-0">
+      {/* phone: one card per payslip */}
+      <div className="space-y-3 sm:hidden">
+        {slips.length === 0 && <p className="card muted text-center text-sm">No payslips yet.</p>}
+        {slips.map((p) => (
+          <div key={p.id} className="card space-y-1.5">
+            <div className="flex items-center justify-between gap-2">
+              <p className="font-semibold">{!isTeacher && p.teachers?.name ? `${p.teachers.name} · ` : ""}{monthLabel(p.month)}</p>
+              <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${p.status === "paid" ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300" : "bg-amber-100 text-amber-700 dark:bg-amber-500/20 dark:text-amber-300"}`}>{p.status}</span>
+            </div>
+            <div className="flex justify-between text-sm"><span className="muted">Basic salary</span><span>{cur} {Number(p.basic_salary).toLocaleString()}</span></div>
+            <div className="flex justify-between text-sm"><span className="muted">Absent days</span><span>{p.absent_days}</span></div>
+            <div className="flex justify-between text-sm"><span className="muted">Deduction</span><span>{cur} {Number(p.deduction).toLocaleString()}</span></div>
+            <div className="flex justify-between text-base font-bold"><span>Net salary</span><span>{cur} {Number(p.net_salary).toLocaleString()}</span></div>
+            <div className="flex items-center gap-4 pt-1">
+              <Link href={`/${slug}/payslips/${p.id}`} className="font-medium text-indigo-600 hover:underline">View</Link>
+              {!isTeacher && (
+                <form action={setPayslipPaid.bind(null, slug, p.id, p.status !== "paid")}>
+                  <button className="text-xs text-slate-500">{p.status === "paid" ? "Mark unpaid" : "Mark paid"}</button>
+                </form>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="card hidden overflow-x-auto p-0 sm:block">
         <table className="w-full text-left text-sm">
           <thead className="bg-slate-50 text-xs uppercase text-slate-500 dark:bg-white/5 dark:text-slate-400">
             <tr>

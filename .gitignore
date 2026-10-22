@@ -3,3 +3,6 @@
 /public/uploads/*
 !/public/uploads/.gitkeep
 *.log
+
+# demo videos (large)
+videos/
